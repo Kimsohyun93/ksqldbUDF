@@ -22,7 +22,7 @@ public class Multiply {
   }
 
   @Udf(description = "multiply two non-nullable DOUBLEs.")
-  public double multiply(final double v1, double v2) {
+  public double multiply(final double v1, final double v2) {
     return v1 * v2;
   }
 }
