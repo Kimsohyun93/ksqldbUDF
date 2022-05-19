@@ -13,10 +13,6 @@ public class Multiply {
     return v1 * v2;
   }
 
-  @Udf(description = "multiply two non-nullable BIGINTs.")
-  public long multiply(@UdfParameter(value = "v1", description = "first value to multiply") long v1, @UdfParameter(value = "v2", description = "second value to multiply") long v2) {
-    return v1 * v2;
-  }
 
   @Udf(description = "multiply two nullable BIGINTs. If either param is null, null is returned.")
   public Long multiply(@UdfParameter(value = "v1", description = "first value to multiply") Long v1, @UdfParameter(value = "v2", description = "second value to multiply") Long v2) {
