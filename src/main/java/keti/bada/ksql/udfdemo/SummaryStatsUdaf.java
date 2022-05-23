@@ -34,11 +34,17 @@ public final class SummaryStatsUdaf {
   }
 
   @UdafFactory(description = "compute summary stats for doubles")
-  // Can be used with stream aggregations. The input of our aggregation will be doubles,
-  // and the output will be a map
+  /**
+   * Can be used with stream aggregations. The input of our aggregation will be doubles,
+   * and the output will be a map
+   * 
+   * @param I is the input type of the UDAF. A is the data type of the intermediate storage used to keep track of the state of the UDAF. O is the data type of the return value.
+   * @return int[]
+   */
+
+  //  
   public static Udaf<Double, Map<String, Double>, Map<String, Double>> createUdaf() {
 
-    System.out.println("THIS IS UDAF Argument ######################################");
     return new Udaf<Double, Map<String, Double>, Map<String, Double>>() {
 
       /**
@@ -48,10 +54,16 @@ public final class SummaryStatsUdaf {
        */
       @Override
       public Map<String, Double> initialize() {
+
+        System.out.println("INITIALIZE Stats Data");
+
         final Map<String, Double> stats = new HashMap<>();
         stats.put("mean", 0.0);
         stats.put("sample_size", 0.0);
         stats.put("sum", 0.0);
+
+        System.out.println(stats);
+
         return stats;
       }
 
@@ -67,6 +79,11 @@ public final class SummaryStatsUdaf {
               final Double newValue,
               final Map<String, Double> aggregateValue
       ) {
+        System.out.println("AGGREGATE FUNCTION NEW VALUE");
+        System.out.println(newValue);
+        System.out.println("AGGREGATE FUNCTION AGGREGATE VALUE");
+        System.out.println(aggregateValue);
+
         final Double sampleSize = 1.0 + aggregateValue
                 .getOrDefault("sample_size", 0.0);
 
@@ -92,6 +109,10 @@ public final class SummaryStatsUdaf {
               final Map<String, Double> aggOne,
               final Map<String, Double> aggTwo
       ) {
+        System.out.println("MERGE FUNCTION AGG ONE");
+        System.out.println(aggOne);
+        System.out.println("MERGE FUNCTION AGG TWO");
+        System.out.println(aggTwo);
         final Double sampleSize =
                 aggOne.getOrDefault("sample_size", 0.0) + aggTwo.getOrDefault("sample_size", 0.0);
         final Double sum =
