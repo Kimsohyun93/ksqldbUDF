@@ -1,12 +1,19 @@
 package keti.bada.ksql.udfdemo;
 
 import io.confluent.ksql.function.udaf.Udaf;
+import io.confluent.ksql.function.udaf.UdafDescription;
 import io.confluent.ksql.function.udaf.UdafFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class InflectionPointUdaf {
+@UdafDescription(
+        name = "inflection_points",
+        description = "Example UDAF that computes some summary stats for a stream of doubles",
+        version = "0.1.0-SNAPSHOT",
+        author = "Shekhar"
+)
+public final class InflectionPointUdaf {
   private InflectionPointUdaf() {
   }
 
