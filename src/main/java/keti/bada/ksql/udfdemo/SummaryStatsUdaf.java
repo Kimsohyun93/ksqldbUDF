@@ -62,8 +62,6 @@ public final class SummaryStatsUdaf {
         stats.put("sample_size", 0.0);
         stats.put("sum", 0.0);
 
-        System.out.println(stats);
-
         return stats;
       }
 
@@ -79,11 +77,6 @@ public final class SummaryStatsUdaf {
               final Double newValue,
               final Map<String, Double> aggregateValue
       ) {
-        System.out.println("AGGREGATE FUNCTION NEW VALUE");
-        System.out.println(newValue);
-        System.out.println("AGGREGATE FUNCTION AGGREGATE VALUE");
-        System.out.println(aggregateValue);
-
         final Double sampleSize = 1.0 + aggregateValue
                 .getOrDefault("sample_size", 0.0);
 
@@ -99,6 +92,7 @@ public final class SummaryStatsUdaf {
 
       /**
        * Called to merge two aggregates together.
+       * The merge method is only called when merging sessions when session windowing is used.
        *
        * @param aggOne the first aggregate
        * @param aggTwo the second aggregate
@@ -109,10 +103,6 @@ public final class SummaryStatsUdaf {
               final Map<String, Double> aggOne,
               final Map<String, Double> aggTwo
       ) {
-        System.out.println("MERGE FUNCTION AGG ONE");
-        System.out.println(aggOne);
-        System.out.println("MERGE FUNCTION AGG TWO");
-        System.out.println(aggTwo);
         final Double sampleSize =
                 aggOne.getOrDefault("sample_size", 0.0) + aggTwo.getOrDefault("sample_size", 0.0);
         final Double sum =
