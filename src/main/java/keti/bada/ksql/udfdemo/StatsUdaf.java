@@ -32,15 +32,12 @@ public class StatsUdaf {
           ">";
 
   public static final Schema AGGREGATE_SCHEMA = SchemaBuilder.struct().optional()
-          .field("MIN", Schema.OPTIONAL_INT64_SCHEMA)
-          .field("MAX", Schema.OPTIONAL_INT64_SCHEMA)
-          .field("COUNT", Schema.OPTIONAL_INT64_SCHEMA)
+          .field(WSTART, Schema.OPTIONAL_STRING_SCHEMA)
+          .field(AVG, Schema.OPTIONAL_FLOAT64_SCHEMA)
           .build();
-
   public static final String AGGREGATE_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "MIN BIGINT," +
-          "MAX BIGINT," +
-          "COUNT BIGINT" +
+          "WSTART STRING" +
+          "AVG DOUBLE" +
           ">";
 
   public static final Schema RETURN_SCHEMA = SchemaBuilder.struct().optional()
@@ -68,8 +65,8 @@ public class StatsUdaf {
     @Override
     public Struct initialize() {
       System.out.println("INITIALIZE Stats Data");
-      final Struct data = new HashMap<>();
-      data.put("1900-01-01 00:00:00 +0900", 0.0);
+      final Struct data = new Struct(AGGREGATE_SCHEMA);
+//      data.put("1900-01-01 00:00:00 +0900", 0.0);
       System.out.println(data);
       return data;
     }
