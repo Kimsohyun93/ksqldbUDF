@@ -17,8 +17,8 @@ import static io.confluent.ksql.schema.ksql.types.SqlTypes.struct;
 
 
 @UdafDescription(
-        name = "inflection_counts",
-        description = "Example UDAF that computes some points at which the slope changes rapidly",
+        name = "inflection_points",
+        description = "compute inflection points",
 //        aggregateSchema="STRUCT<WSTART varchar, AVG double>",
         version = "0.1.0-SNAPSHOT",
         author = "shkim"
@@ -42,7 +42,7 @@ public final class InflectionPointUdaf {
   private InflectionPointUdaf() {
   }
 
-  @UdafFactory(description = "compute the slope and find the inflection point counts",
+  @UdafFactory(description = "compute the slope and find the inflection points",
   paramSchema = PARAM_SCHEMA_DESCRIPTOR)
   public static Udaf<Struct, Map<String, Double>, Map<String, Double>> createUdaf() {
 
@@ -119,7 +119,7 @@ public final class InflectionPointUdaf {
         Double previous_value = 0.0;
         Map<String, Double> result = new HashMap<>(); // return
         Double previous_result = 0.0; // 내 이전 값의 차
-
+        agg.remove("1900-01-01 00:00:00 +0900");
         // inflection point 계산
         for ( Map.Entry<String, Double> elem : agg.entrySet()){
           if(index == agg.size() -1){
