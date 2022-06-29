@@ -19,11 +19,10 @@ import java.util.Map;
 public class StatsUdaf {
 
   public static final Schema PARAM_SCHEMA = SchemaBuilder.struct().optional()
-          .field("WSTART", Schema.OPTIONAL_STRING_SCHEMA)
+          .field("AVG", Schema.OPTIONAL_FLOAT64_SCHEMA)
           .build();
 
   public static final String PARAM_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "WSTART VARCHAR" +
           "AVG DOUBLE" +
           ">";
 
