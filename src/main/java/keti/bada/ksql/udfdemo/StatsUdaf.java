@@ -18,36 +18,39 @@ import java.util.Map;
         description = "Maintains statistical values.")
 public class StatsUdaf {
 
-  private static final String WSTART = "WSTART";
-  private static final String AVG = "AVG";
-
   public static final Schema PARAM_SCHEMA = SchemaBuilder.struct().optional()
-          .field(WSTART, Schema.OPTIONAL_STRING_SCHEMA)
-          .field(AVG, Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .field("C", Schema.OPTIONAL_INT64_SCHEMA)
           .build();
 
   public static final String PARAM_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "WSTART STRING" +
-          "AVG DOUBLE" +
+          "C BIGINT" +
           ">";
 
   public static final Schema AGGREGATE_SCHEMA = SchemaBuilder.struct().optional()
-          .field(WSTART, Schema.OPTIONAL_STRING_SCHEMA)
-          .field(AVG, Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .field("MIN", Schema.OPTIONAL_INT64_SCHEMA)
+          .field("MAX", Schema.OPTIONAL_INT64_SCHEMA)
+          .field("COUNT", Schema.OPTIONAL_INT64_SCHEMA)
           .build();
+
   public static final String AGGREGATE_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "WSTART STRING" +
-          "AVG DOUBLE" +
+          "MIN BIGINT," +
+          "MAX BIGINT," +
+          "COUNT BIGINT" +
           ">";
 
   public static final Schema RETURN_SCHEMA = SchemaBuilder.struct().optional()
-          .field(WSTART, Schema.OPTIONAL_STRING_SCHEMA)
+          .field("MIN", Schema.OPTIONAL_INT64_SCHEMA)
+          .field("MAX", Schema.OPTIONAL_INT64_SCHEMA)
+          .field("COUNT", Schema.OPTIONAL_INT64_SCHEMA)
+          .field("DIFFERENTIAL", Schema.OPTIONAL_INT64_SCHEMA)
           .build();
 
   public static final String RETURN_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "WSTART STRING" +
+          "MIN BIGINT," +
+          "MAX BIGINT," +
+          "COUNT BIGINT," +
+          "DIFFERENTIAL BIGINT" +
           ">";
-
 
   private StatsUdaf() {
   }
@@ -64,21 +67,20 @@ public class StatsUdaf {
 
     @Override
     public Struct initialize() {
-      System.out.println("INITIALIZE Stats Data");
-      final Struct data = new Struct(AGGREGATE_SCHEMA);
-      data.put(WSTART, "1900-01-01 00:00:00 +0900");
-      data.put(AVG, 0.0);
-      System.out.println(data);
-      return data;
+      return new Struct(AGGREGATE_SCHEMA);
     }
 
     @Override
     public Struct aggregate(Struct newValue, Struct aggregateValue) {
-      Double avg = newValue.getFloat64("AVG");
-      Double wstart = newValue.getFloat64("WSTART");
+      long c = newValue.getInt64("C");
 
-      aggregateValue.put(WSTART, wstart);
-      aggregateValue.put(AVG, avg);
+      long min = Math.min(c, getMin(aggregateValue));
+      long max = Math.max(c, getMax(aggregateValue));
+      long count = (getCount(aggregateValue) + 1);
+
+      aggregateValue.put("MIN", min);
+      aggregateValue.put("MAX", max);
+      aggregateValue.put("COUNT", count);
 
       return aggregateValue;
     }
@@ -86,8 +88,14 @@ public class StatsUdaf {
     @Override
     public Struct map(Struct intermediate) {
       Struct result = new Struct(RETURN_SCHEMA);
-      result.put("WSTART", intermediate.getString(WSTART));
 
+      long min = intermediate.getInt64("MIN");
+      long max = intermediate.getInt64("MAX");
+
+      result.put("MIN", min);
+      result.put("MAX", max);
+      result.put("COUNT", intermediate.getInt64("COUNT"));
+      result.put("DIFFERENTIAL", max - min);
 
       return result;
     }
@@ -97,5 +105,34 @@ public class StatsUdaf {
       return aggOne;
     }
 
+    private Long getMin(Struct aggregateValue) {
+      Long result = aggregateValue.getInt64("MIN");
+
+      if (result != null) {
+        return result;
+      } else {
+        return Long.MAX_VALUE;
+      }
+    }
+
+    private Long getMax(Struct aggregateValue) {
+      Long result = aggregateValue.getInt64("MAX");
+
+      if (result != null) {
+        return result;
+      } else {
+        return Long.MIN_VALUE;
+      }
+    }
+
+    private Long getCount(Struct aggregateValue) {
+      Long result = aggregateValue.getInt64("COUNT");
+
+      if (result != null) {
+        return result;
+      } else {
+        return 0L;
+      }
+    }
   }
 }
