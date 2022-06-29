@@ -23,7 +23,7 @@ public class StatsUdaf {
           .build();
 
   public static final String PARAM_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "C BIGINT" +
+          "C DOUBLE" +
           ">";
 
   public static final Schema AGGREGATE_SCHEMA = SchemaBuilder.struct().optional()
@@ -33,9 +33,9 @@ public class StatsUdaf {
           .build();
 
   public static final String AGGREGATE_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "MIN BIGINT," +
-          "MAX BIGINT," +
-          "COUNT BIGINT" +
+          "MIN DOUBLE," +
+          "MAX DOUBLE," +
+          "COUNT DOUBLE" +
           ">";
 
   public static final Schema RETURN_SCHEMA = SchemaBuilder.struct().optional()
@@ -46,10 +46,10 @@ public class StatsUdaf {
           .build();
 
   public static final String RETURN_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "MIN BIGINT," +
-          "MAX BIGINT," +
-          "COUNT BIGINT," +
-          "DIFFERENTIAL BIGINT" +
+          "MIN DOUBLE," +
+          "MAX DOUBLE," +
+          "COUNT DOUBLE," +
+          "DIFFERENTIAL DOUBLE" +
           ">";
 
   private StatsUdaf() {
