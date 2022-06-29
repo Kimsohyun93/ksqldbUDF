@@ -59,23 +59,23 @@ public class StatsUdaf {
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           aggregateSchema = AGGREGATE_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct, Map<String, Double>, Struct> createUdaf() {
+  public static Udaf<Struct, Struct, Struct> createUdaf() {
     return new StatsUdafImpl();
   }
 
-  private static class StatsUdafImpl implements Udaf<Struct, Map<String, Double>, Struct> {
+  private static class StatsUdafImpl implements Udaf<Struct, Struct, Struct> {
 
     @Override
-    public Map<String, Double> initialize() {
+    public Struct initialize() {
       System.out.println("INITIALIZE Stats Data");
-      final Map<String, Double> data = new HashMap<>();
+      final Struct data = new HashMap<>();
       data.put("1900-01-01 00:00:00 +0900", 0.0);
       System.out.println(data);
       return data;
     }
 
     @Override
-    public Map<String, Double> aggregate(Struct newValue, Map<String, Double> aggregateValue) {
+    public Struct aggregate(Struct newValue, Struct aggregateValue) {
       Double AVG = newValue.getFloat64("AVG");
       Double WSTART = newValue.getFloat64("WSTART");
 
@@ -84,7 +84,7 @@ public class StatsUdaf {
     }
 
     @Override
-    public Struct map(Map<String, Double> intermediate) {
+    public Struct map(Struct intermediate) {
       Struct result = new Struct(RETURN_SCHEMA);
 
 
@@ -92,7 +92,7 @@ public class StatsUdaf {
     }
 
     @Override
-    public Map<String, Double> merge(Map<String, Double> aggOne, Map<String, Double> aggTwo) {
+    public Struct merge(Struct aggOne, Struct aggTwo) {
       return aggOne;
     }
 //
