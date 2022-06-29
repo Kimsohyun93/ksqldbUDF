@@ -142,8 +142,13 @@ public final class InflectionPointUdaf {
           }
           Double present_result = elem.getValue() - previous_value;
           if(previous_result / present_result <= 0){ // 부호 다름
-            wstartString = result.getString(WSTART);
-            wstartString += previous_key + " ";
+            if(result.getString(WSTART) != null){
+              wstartString = result.getString(WSTART);
+              wstartString += previous_key + " ";
+            }else{
+              wstartString = previous_key + " ";
+            }
+
             result.put(WSTART, wstartString);
           }
           previous_result = present_result;
