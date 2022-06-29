@@ -54,9 +54,6 @@ public final class SummaryStatsUdaf {
        */
       @Override
       public Map<String, Double> initialize() {
-
-        System.out.println("INITIALIZE Stats Data");
-
         final Map<String, Double> stats = new HashMap<>();
         stats.put("mean", 0.0);
         stats.put("sample_size", 0.0);

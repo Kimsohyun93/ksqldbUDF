@@ -3,59 +3,70 @@ package keti.bada.ksql.udfdemo;
 import io.confluent.ksql.function.udaf.Udaf;
 import io.confluent.ksql.function.udaf.UdafDescription;
 import io.confluent.ksql.function.udaf.UdafFactory;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Struct;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.confluent.ksql.schema.ksql.types.SqlTypes.DOUBLE;
+import static io.confluent.ksql.schema.ksql.types.SqlTypes.struct;
+
+
 @UdafDescription(
-        name = "inflection_points",
-        description = "Example UDAF that computes some summary stats for a stream of doubles",
+        name = "inflection_counts",
+        description = "Example UDAF that computes some points at which the slope changes rapidly",
+//        aggregateSchema="STRUCT<WSTART varchar, AVG double>",
         version = "0.1.0-SNAPSHOT",
-        author = "Shekhar"
+        author = "shkim"
 )
 public final class InflectionPointUdaf {
+
+  private static final String WSTART = "WSTART";
+  private static final String AVG = "AVG";
+
   private InflectionPointUdaf() {
   }
 
-  @UdafFactory(description = "compute the slope and find the inflection point")
-  public static Udaf<Double, Map<String, Double>, Map<String, Double>> createUdaf() {
-    return new Udaf<Double, Map<String, Double>, Map<String, Double>>() {
+  @UdafFactory(description = "compute the slope and find the inflection point counts")
+  public static Udaf<Struct, Map<String, Double>, Map<String, Double>> createUdaf() {
+
+    final Schema STRUCT_WINDOW = SchemaBuilder.struct().optional()
+            .field(WSTART, Schema.OPTIONAL_STRING_SCHEMA)
+            .field(AVG, Schema.OPTIONAL_FLOAT64_SCHEMA)
+            .build();
+
+    return new Udaf<Struct, Map<String, Double>, Map<String, Double>>() {
       @Override
       public Map<String, Double> initialize() {
 
         System.out.println("INITIALIZE Stats Data");
-
-        final Map<String, Double> stats = new HashMap<>();
-        stats.put("mean", 0.0);
-        stats.put("sample_size", 0.0);
-        stats.put("sum", 0.0);
-
-        System.out.println(stats);
-
-        return stats;
+        final Map<String, Double> data = new HashMap<>();
+        data.put("1900-01-01 00:00:00 +0900", 0.0);
+        System.out.println(data);
+        return data;
       }
 
 
       @Override
       public Map<String, Double> aggregate(
-              final Double newValue,
+              final Struct newValue,
               final Map<String, Double> aggregateValue
       ) {
         System.out.println("AGGREGATE FUNCTION NEW VALUE");
         System.out.println(newValue);
-        System.out.println("AGGREGATE FUNCTION AGGREGATE VALUE");
-        System.out.println(aggregateValue);
 
-        final Double sampleSize = 1.0 + aggregateValue
-                .getOrDefault("sample_size", 0.0);
+        final String startData = newValue.getString(WSTART);
+        final Double avgData = newValue.getFloat64(AVG);
 
-        final Double sum = newValue + aggregateValue
-                .getOrDefault("sum", 0.0);
+        aggregateValue.put(startData,avgData);
 
-        // calculate the new aggregate
-        aggregateValue.put("mean", sum / sampleSize);
-        aggregateValue.put("sample_size", sampleSize);
-        aggregateValue.put("sum", sum);
+//        System.out.println("AGGREGATE FUNCTION AGGREGATE VALUE");
+//        System.out.println(aggregateValue);
+
         return aggregateValue;
       }
 
@@ -65,26 +76,65 @@ public final class InflectionPointUdaf {
               final Map<String, Double> aggOne,
               final Map<String, Double> aggTwo
       ) {
-        System.out.println("MERGE FUNCTION AGG ONE");
-        System.out.println(aggOne);
-        System.out.println("MERGE FUNCTION AGG TWO");
-        System.out.println(aggTwo);
-        final Double sampleSize =
-                aggOne.getOrDefault("sample_size", 0.0) + aggTwo.getOrDefault("sample_size", 0.0);
-        final Double sum =
-                aggOne.getOrDefault("sum", 0.0) + aggTwo.getOrDefault("sum", 0.0);
+        System.out.println("========== MERGE FUNCTION");
 
-        // calculate the new aggregate
-        final Map<String, Double> newAggregate = new HashMap<>();
-        newAggregate.put("mean", sum / sampleSize);
-        newAggregate.put("sample_size", sampleSize);
-        newAggregate.put("sum", sum);
+        // 키로 정렬
+        String[] mapkeyOne = (String[]) aggOne.keySet().toArray();
+        Arrays.sort(mapkeyOne);
+        String[] mapkeyTwo = (String[]) aggTwo.keySet().toArray();
+        Arrays.sort(mapkeyTwo);
+
+        Map<String, Double> newAggregate = new HashMap<>();
+        if (mapkeyOne[0].compareTo(mapkeyTwo[0]) < 0){
+            // 사전적으로 one 이 앞에 있을 때
+          newAggregate = aggOne;
+          for(String key : aggTwo.keySet() ){
+            newAggregate.put(key, aggTwo.get(key));
+          }
+        }else {
+          newAggregate = aggTwo;
+          for(String key : aggOne.keySet() ){
+            newAggregate.put(key, aggOne.get(key));
+          }
+        }
         return newAggregate;
       }
 
       @Override
-      public Map<String, Double> map(final Map<String, Double> agg) {
-        return agg;
+      public Map<String,Double> map(final Map<String, Double> agg) {
+
+        // 키로 정렬
+        Object[] mapkey = agg.keySet().toArray();
+        Arrays.sort(mapkey);
+        int index=0;
+
+        String previous_key = "";
+        Double previous_value = 0.0;
+        Map<String, Double> result = new HashMap<>(); // return
+        Double previous_result = 0.0; // 내 이전 값의 차
+
+        // inflection point 계산
+        for ( Map.Entry<String, Double> elem : agg.entrySet()){
+          if(index == agg.size() -1){
+            break;
+          }
+          if (index == 0){
+            previous_key = elem.getKey();
+            previous_value = elem.getValue();
+            index ++;
+            continue;
+          }
+          Double present_result = elem.getValue() - previous_value;
+          if(previous_result / present_result <= 0){ // 부호 다름
+            result.put(elem.getKey(), elem.getValue());
+          }
+          previous_result = present_result;
+          previous_key = elem.getKey();
+          previous_value = elem.getValue();
+          index ++;
+        }
+        System.out.println(result);
+        return result;
       }
     };
   }
