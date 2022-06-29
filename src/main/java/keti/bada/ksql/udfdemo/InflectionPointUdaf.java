@@ -73,11 +73,11 @@ public final class InflectionPointUdaf {
       ) {
         System.out.println("AGGREGATE FUNCTION NEW VALUE");
         System.out.println(newValue);
-
-        final String startData = newValue.getString(WSTART);
-        final Double avgData = newValue.getFloat64(AVG);
-
-        aggregateValue.put(startData,avgData);
+//
+//        final String startData = newValue.getString(WSTART);
+//        final Double avgData = newValue.getFloat64(AVG);
+//
+//        aggregateValue.put(startData,avgData);
 
 //        System.out.println("AGGREGATE FUNCTION AGGREGATE VALUE");
 //        System.out.println(aggregateValue);
