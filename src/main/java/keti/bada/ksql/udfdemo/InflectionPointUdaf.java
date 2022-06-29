@@ -129,6 +129,7 @@ public final class InflectionPointUdaf {
         Double previous_result = 0.0; // 내 이전 값의 차
         sortedMap.remove("1900-01-01 00:00:00 +0900");
         // inflection point 계산
+        String wstartString = "";
         for ( Map.Entry<String, Double> elem : sortedMap.entrySet()){
           if(index == sortedMap.size() -1){
             break;
@@ -141,7 +142,7 @@ public final class InflectionPointUdaf {
           }
           Double present_result = elem.getValue() - previous_value;
           if(previous_result / present_result <= 0){ // 부호 다름
-            String wstartString = result.getString(WSTART);
+            wstartString = result.getString(WSTART);
             wstartString += previous_key + " ";
             result.put(WSTART, wstartString);
           }
