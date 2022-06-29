@@ -7,10 +7,7 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static io.confluent.ksql.schema.ksql.types.SqlTypes.DOUBLE;
 import static io.confluent.ksql.schema.ksql.types.SqlTypes.struct;
@@ -121,11 +118,12 @@ public final class InflectionPointUdaf {
 
         Struct result = new Struct(RETURN_SCHEMA);
         // 키로 정렬
+        Map<String, Double> sortedMap = new TreeMap<>(agg);
         Object[] mapkey = agg.keySet().toArray();
         Arrays.sort(mapkey);
         int index=0;
         System.out.println("========== AGG KEYSET");
-        System.out.println(agg.keySet());
+        System.out.println(sortedMap.keySet());
 
         String previous_key = "";
         Double previous_value = 0.0;
