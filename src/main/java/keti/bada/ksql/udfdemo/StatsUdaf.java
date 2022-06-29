@@ -24,7 +24,7 @@ public class StatsUdaf {
           .build();
 
   public static final String PARAM_SCHEMA_DESCRIPTOR = "STRUCT<" +
-          "WSTART STRING" +
+          "WSTART VARCHAR" +
           "AVG DOUBLE" +
           ">";
 
