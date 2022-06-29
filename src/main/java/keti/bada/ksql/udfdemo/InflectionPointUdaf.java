@@ -38,15 +38,22 @@ public final class InflectionPointUdaf {
           "AVG DOUBLE" +
           ">";
 
+  public static final Schema RETURN_SCHEMA = SchemaBuilder.struct().optional()
+          .field(WSTART, Schema.OPTIONAL_STRING_SCHEMA)
+          .build();
+
+  public static final String RETURN_SCHEMA_DESCRIPTOR = "STRUCT<" +
+          "WSTART STRING" +
+          ">";
 
   private InflectionPointUdaf() {
   }
 
   @UdafFactory(description = "compute the slope and find the inflection points",
   paramSchema = PARAM_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct, Map<String, Double>, Map<String, Double>> createUdaf() {
+  public static Udaf<Struct, Map<String, Double>, Struct> createUdaf() {
 
-    return new Udaf<Struct, Map<String, Double>, Map<String, Double>>() {
+    return new Udaf<Struct, Map<String, Double>, Struct>() {
       @Override
       public Map<String, Double> initialize() {
 
@@ -108,8 +115,9 @@ public final class InflectionPointUdaf {
       }
 
       @Override
-      public Map<String,Double> map(final Map<String, Double> agg) {
+      public Struct map(final Map<String, Double> agg) {
 
+        Struct result = new Struct(RETURN_SCHEMA);
         // 키로 정렬
         Object[] mapkey = agg.keySet().toArray();
         Arrays.sort(mapkey);
@@ -117,7 +125,7 @@ public final class InflectionPointUdaf {
 
         String previous_key = "";
         Double previous_value = 0.0;
-        Map<String, Double> result = new HashMap<>(); // return
+//        Map<String, Double> result = new HashMap<>(); // return
         Double previous_result = 0.0; // 내 이전 값의 차
         agg.remove("1900-01-01 00:00:00 +0900");
         // inflection point 계산
@@ -133,7 +141,9 @@ public final class InflectionPointUdaf {
           }
           Double present_result = elem.getValue() - previous_value;
           if(previous_result / present_result <= 0){ // 부호 다름
-            result.put(elem.getKey(), elem.getValue());
+            String wstartString = result.getString(WSTART);
+            wstartString += previous_key + " ";
+            result.put(WSTART, wstartString);
           }
           previous_result = present_result;
           previous_key = elem.getKey();
