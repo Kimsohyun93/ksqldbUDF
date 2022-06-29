@@ -121,38 +121,38 @@ public final class InflectionPointUdaf {
 
         Struct result = new Struct(RETURN_SCHEMA);
         // 키로 정렬
-        Object[] mapkey = agg.keySet().toArray();
-        Arrays.sort(mapkey);
-        int index=0;
-
-        String previous_key = "";
-        Double previous_value = 0.0;
-//        Map<String, Double> result = new HashMap<>(); // return
-        Double previous_result = 0.0; // 내 이전 값의 차
-        agg.remove("1900-01-01 00:00:00 +0900");
-        // inflection point 계산
-        for ( Map.Entry<String, Double> elem : agg.entrySet()){
-          if(index == agg.size() -1){
-            break;
-          }
-          if (index == 0){
-            previous_key = elem.getKey();
-            previous_value = elem.getValue();
-            index ++;
-            continue;
-          }
-          Double present_result = elem.getValue() - previous_value;
-          if(previous_result / present_result <= 0){ // 부호 다름
-            String wstartString = result.getString(WSTART);
-            wstartString += previous_key + " ";
-            result.put(WSTART, wstartString);
-          }
-          previous_result = present_result;
-          previous_key = elem.getKey();
-          previous_value = elem.getValue();
-          index ++;
-        }
-        System.out.println(result);
+//        Object[] mapkey = agg.keySet().toArray();
+//        Arrays.sort(mapkey);
+//        int index=0;
+//
+//        String previous_key = "";
+//        Double previous_value = 0.0;
+////        Map<String, Double> result = new HashMap<>(); // return
+//        Double previous_result = 0.0; // 내 이전 값의 차
+//        agg.remove("1900-01-01 00:00:00 +0900");
+//        // inflection point 계산
+//        for ( Map.Entry<String, Double> elem : agg.entrySet()){
+//          if(index == agg.size() -1){
+//            break;
+//          }
+//          if (index == 0){
+//            previous_key = elem.getKey();
+//            previous_value = elem.getValue();
+//            index ++;
+//            continue;
+//          }
+//          Double present_result = elem.getValue() - previous_value;
+//          if(previous_result / present_result <= 0){ // 부호 다름
+//            String wstartString = result.getString(WSTART);
+//            wstartString += previous_key + " ";
+//            result.put(WSTART, wstartString);
+//          }
+//          previous_result = present_result;
+//          previous_key = elem.getKey();
+//          previous_value = elem.getValue();
+//          index ++;
+//        }
+//        System.out.println(result);
         return result;
       }
     };
