@@ -19,13 +19,13 @@ import java.util.Map;
 public class StatsUdaf {
 
   public static final Schema PARAM_SCHEMA = SchemaBuilder.struct().optional()
-//          .field("AVG", Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .field("AVG", Schema.OPTIONAL_FLOAT64_SCHEMA)
           .field("WSTART", Schema.OPTIONAL_STRING_SCHEMA)
           .build();
 
   public static final String PARAM_SCHEMA_DESCRIPTOR = "STRUCT<" +
+          "AVG DOUBLE," +
           "WSTART STRING" +
-//          "AVG DOUBLE" +
           ">";
 
   public static final Schema AGGREGATE_SCHEMA = SchemaBuilder.struct().optional()
