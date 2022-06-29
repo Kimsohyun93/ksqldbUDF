@@ -19,7 +19,7 @@ import java.util.Map;
 public class StatsUdaf {
 
   public static final Schema PARAM_SCHEMA = SchemaBuilder.struct().optional()
-          .field("C", Schema.OPTIONAL_INT64_SCHEMA)
+          .field("C", Schema.OPTIONAL_FLOAT64_SCHEMA)
           .build();
 
   public static final String PARAM_SCHEMA_DESCRIPTOR = "STRUCT<" +
@@ -27,9 +27,9 @@ public class StatsUdaf {
           ">";
 
   public static final Schema AGGREGATE_SCHEMA = SchemaBuilder.struct().optional()
-          .field("MIN", Schema.OPTIONAL_INT64_SCHEMA)
-          .field("MAX", Schema.OPTIONAL_INT64_SCHEMA)
-          .field("COUNT", Schema.OPTIONAL_INT64_SCHEMA)
+          .field("MIN", Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .field("MAX", Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .field("COUNT", Schema.OPTIONAL_FLOAT64_SCHEMA)
           .build();
 
   public static final String AGGREGATE_SCHEMA_DESCRIPTOR = "STRUCT<" +
@@ -39,10 +39,10 @@ public class StatsUdaf {
           ">";
 
   public static final Schema RETURN_SCHEMA = SchemaBuilder.struct().optional()
-          .field("MIN", Schema.OPTIONAL_INT64_SCHEMA)
-          .field("MAX", Schema.OPTIONAL_INT64_SCHEMA)
-          .field("COUNT", Schema.OPTIONAL_INT64_SCHEMA)
-          .field("DIFFERENTIAL", Schema.OPTIONAL_INT64_SCHEMA)
+          .field("MIN", Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .field("MAX", Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .field("COUNT", Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .field("DIFFERENTIAL", Schema.OPTIONAL_FLOAT64_SCHEMA)
           .build();
 
   public static final String RETURN_SCHEMA_DESCRIPTOR = "STRUCT<" +
@@ -59,37 +59,37 @@ public class StatsUdaf {
           paramSchema = PARAM_SCHEMA_DESCRIPTOR,
           aggregateSchema = AGGREGATE_SCHEMA_DESCRIPTOR,
           returnSchema = RETURN_SCHEMA_DESCRIPTOR)
-  public static Udaf<Struct, Struct, Struct> createUdaf() {
+  public static Udaf<Struct, Map<String, Double>, Struct> createUdaf() {
     return new StatsUdafImpl();
   }
 
-  private static class StatsUdafImpl implements Udaf<Struct, Struct, Struct> {
+  private static class StatsUdafImpl implements Udaf<Struct, Map<String, Double>, Struct> {
 
     @Override
-    public Struct initialize() {
-      return new Struct(AGGREGATE_SCHEMA);
+    public Map<String, Double> initialize() {
+      return new HashMap<String, Double>();
     }
 
     @Override
-    public Struct aggregate(Struct newValue, Struct aggregateValue) {
-      long c = newValue.getInt64("C");
+    public Map<String, Double> aggregate(Struct newValue, Map<String, Double> aggregateValue) {
+      Double c = newValue.getFloat64("C");
 
       return aggregateValue;
     }
 
     @Override
-    public Struct map(Struct intermediate) {
+    public Struct map(Map<String, Double> intermediate) {
       Struct result = new Struct(RETURN_SCHEMA);
 
-      long min = intermediate.getInt64("MIN");
-      long max = intermediate.getInt64("MAX");
+      Double min = intermediate.get("MIN");
+      Double max = intermediate.get("MAX");
 
 
       return result;
     }
 
     @Override
-    public Struct merge(Struct aggOne, Struct aggTwo) {
+    public Map<String, Double> merge(Map<String, Double> aggOne, Map<String, Double> aggTwo) {
       return aggOne;
     }
 
