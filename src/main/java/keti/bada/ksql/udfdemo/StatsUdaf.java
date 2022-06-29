@@ -66,16 +66,19 @@ public class StatsUdaf {
     public Struct initialize() {
       System.out.println("INITIALIZE Stats Data");
       final Struct data = new Struct(AGGREGATE_SCHEMA);
-//      data.put("1900-01-01 00:00:00 +0900", 0.0);
+      data.put(WSTART, "1900-01-01 00:00:00 +0900");
+      data.put(AVG, 0.0);
       System.out.println(data);
       return data;
     }
 
     @Override
     public Struct aggregate(Struct newValue, Struct aggregateValue) {
-      Double AVG = newValue.getFloat64("AVG");
-      Double WSTART = newValue.getFloat64("WSTART");
+      Double avg = newValue.getFloat64("AVG");
+      Double wstart = newValue.getFloat64("WSTART");
 
+      aggregateValue.put(WSTART, wstart);
+      aggregateValue.put(AVG, avg);
 
       return aggregateValue;
     }
@@ -83,6 +86,7 @@ public class StatsUdaf {
     @Override
     public Struct map(Struct intermediate) {
       Struct result = new Struct(RETURN_SCHEMA);
+      result.put("WSTART", intermediate.getString(WSTART));
 
 
       return result;
@@ -92,35 +96,6 @@ public class StatsUdaf {
     public Struct merge(Struct aggOne, Struct aggTwo) {
       return aggOne;
     }
-//
-//    private Long getMin(Struct aggregateValue) {
-//      Long result = aggregateValue.getInt64("MIN");
-//
-//      if (result != null) {
-//        return result;
-//      } else {
-//        return Long.MAX_VALUE;
-//      }
-//    }
-//
-//    private Long getMax(Struct aggregateValue) {
-//      Long result = aggregateValue.getInt64("MAX");
-//
-//      if (result != null) {
-//        return result;
-//      } else {
-//        return Long.MIN_VALUE;
-//      }
-//    }
-//
-//    private Long getCount(Struct aggregateValue) {
-//      Long result = aggregateValue.getInt64("COUNT");
-//
-//      if (result != null) {
-//        return result;
-//      } else {
-//        return 0L;
-//      }
-//    }
+
   }
 }
