@@ -79,8 +79,8 @@ public final class InflectionPointUdaf {
 
         aggregateValue.put(startData,avgData);
 
-        System.out.println("AGGREGATE FUNCTION AGGREGATE VALUE");
-        System.out.println(aggregateValue);
+//        System.out.println("AGGREGATE FUNCTION AGGREGATE VALUE");
+//        System.out.println(aggregateValue);
 
         return aggregateValue;
       }
@@ -124,6 +124,8 @@ public final class InflectionPointUdaf {
         Object[] mapkey = agg.keySet().toArray();
         Arrays.sort(mapkey);
         int index=0;
+        System.out.println("========== AGG KEYSET");
+        System.out.println(agg.keySet());
 
         String previous_key = "";
         Double previous_value = 0.0;
