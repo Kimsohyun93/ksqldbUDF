@@ -119,8 +119,6 @@ public final class InflectionPointUdaf {
         Struct result = new Struct(RETURN_SCHEMA);
         // 키로 정렬
         Map<String, Double> sortedMap = new TreeMap<>(agg);
-        Object[] mapkey = agg.keySet().toArray();
-        Arrays.sort(mapkey);
         int index=0;
         System.out.println("========== AGG KEYSET");
         System.out.println(sortedMap.keySet());
@@ -129,10 +127,10 @@ public final class InflectionPointUdaf {
         Double previous_value = 0.0;
 //        Map<String, Double> result = new HashMap<>(); // return
         Double previous_result = 0.0; // 내 이전 값의 차
-        agg.remove("1900-01-01 00:00:00 +0900");
+        sortedMap.remove("1900-01-01 00:00:00 +0900");
         // inflection point 계산
-        for ( Map.Entry<String, Double> elem : agg.entrySet()){
-          if(index == agg.size() -1){
+        for ( Map.Entry<String, Double> elem : sortedMap.entrySet()){
+          if(index == sortedMap.size() -1){
             break;
           }
           if (index == 0){
