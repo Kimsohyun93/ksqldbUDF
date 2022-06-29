@@ -74,14 +74,6 @@ public class StatsUdaf {
     public Struct aggregate(Struct newValue, Struct aggregateValue) {
       long c = newValue.getInt64("C");
 
-      long min = Math.min(c, getMin(aggregateValue));
-      long max = Math.max(c, getMax(aggregateValue));
-      long count = (getCount(aggregateValue) + 1);
-
-      aggregateValue.put("MIN", min);
-      aggregateValue.put("MAX", max);
-      aggregateValue.put("COUNT", count);
-
       return aggregateValue;
     }
 
@@ -92,10 +84,6 @@ public class StatsUdaf {
       long min = intermediate.getInt64("MIN");
       long max = intermediate.getInt64("MAX");
 
-      result.put("MIN", min);
-      result.put("MAX", max);
-      result.put("COUNT", intermediate.getInt64("COUNT"));
-      result.put("DIFFERENTIAL", max - min);
 
       return result;
     }
@@ -105,34 +93,5 @@ public class StatsUdaf {
       return aggOne;
     }
 
-    private Long getMin(Struct aggregateValue) {
-      Long result = aggregateValue.getInt64("MIN");
-
-      if (result != null) {
-        return result;
-      } else {
-        return Long.MAX_VALUE;
-      }
-    }
-
-    private Long getMax(Struct aggregateValue) {
-      Long result = aggregateValue.getInt64("MAX");
-
-      if (result != null) {
-        return result;
-      } else {
-        return Long.MIN_VALUE;
-      }
-    }
-
-    private Long getCount(Struct aggregateValue) {
-      Long result = aggregateValue.getInt64("COUNT");
-
-      if (result != null) {
-        return result;
-      } else {
-        return 0L;
-      }
-    }
   }
 }
