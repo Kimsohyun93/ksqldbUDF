@@ -28,16 +28,23 @@ public final class InflectionPointUdaf {
   private static final String WSTART = "WSTART";
   private static final String AVG = "AVG";
 
+  public static final Schema PARAM_SCHEMA = SchemaBuilder.struct().optional()
+          .field(WSTART, Schema.OPTIONAL_STRING_SCHEMA)
+          .field(AVG, Schema.OPTIONAL_FLOAT64_SCHEMA)
+          .build();
+
+  public static final String PARAM_SCHEMA_DESCRIPTOR = "STRUCT<" +
+          "WSTART STRING" +
+          "AVG DOUBLE" +
+          ">";
+
+
   private InflectionPointUdaf() {
   }
 
-  @UdafFactory(description = "compute the slope and find the inflection point counts")
+  @UdafFactory(description = "compute the slope and find the inflection point counts",
+  paramSchema = PARAM_SCHEMA_DESCRIPTOR)
   public static Udaf<Struct, Map<String, Double>, Map<String, Double>> createUdaf() {
-
-    final Schema STRUCT_WINDOW = SchemaBuilder.struct().optional()
-            .field(WSTART, Schema.OPTIONAL_STRING_SCHEMA)
-            .field(AVG, Schema.OPTIONAL_FLOAT64_SCHEMA)
-            .build();
 
     return new Udaf<Struct, Map<String, Double>, Map<String, Double>>() {
       @Override
