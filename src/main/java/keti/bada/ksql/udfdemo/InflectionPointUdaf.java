@@ -50,7 +50,8 @@ public final class InflectionPointUdaf {
   }
 
   @UdafFactory(description = "compute the slope and find the inflection points",
-  paramSchema = PARAM_SCHEMA_DESCRIPTOR)
+  paramSchema = PARAM_SCHEMA_DESCRIPTOR,
+  returnSchema = RETURN_SCHEMA_DESCRIPTOR)
   public static Udaf<Struct, Map<String, Double>, Struct> createUdaf() {
 
     return new Udaf<Struct, Map<String, Double>, Struct>() {
@@ -91,27 +92,28 @@ public final class InflectionPointUdaf {
               final Map<String, Double> aggTwo
       ) {
         System.out.println("========== MERGE FUNCTION");
-
-        // 키로 정렬
-        String[] mapkeyOne = (String[]) aggOne.keySet().toArray();
-        Arrays.sort(mapkeyOne);
-        String[] mapkeyTwo = (String[]) aggTwo.keySet().toArray();
-        Arrays.sort(mapkeyTwo);
-
-        Map<String, Double> newAggregate = new HashMap<>();
-        if (mapkeyOne[0].compareTo(mapkeyTwo[0]) < 0){
-            // 사전적으로 one 이 앞에 있을 때
-          newAggregate = aggOne;
-          for(String key : aggTwo.keySet() ){
-            newAggregate.put(key, aggTwo.get(key));
-          }
-        }else {
-          newAggregate = aggTwo;
-          for(String key : aggOne.keySet() ){
-            newAggregate.put(key, aggOne.get(key));
-          }
-        }
-        return newAggregate;
+//
+//        // 키로 정렬
+//        String[] mapkeyOne = (String[]) aggOne.keySet().toArray();
+//        Arrays.sort(mapkeyOne);
+//        String[] mapkeyTwo = (String[]) aggTwo.keySet().toArray();
+//        Arrays.sort(mapkeyTwo);
+//
+//        Map<String, Double> newAggregate = new HashMap<>();
+//        if (mapkeyOne[0].compareTo(mapkeyTwo[0]) < 0){
+//            // 사전적으로 one 이 앞에 있을 때
+//          newAggregate = aggOne;
+//          for(String key : aggTwo.keySet() ){
+//            newAggregate.put(key, aggTwo.get(key));
+//          }
+//        }else {
+//          newAggregate = aggTwo;
+//          for(String key : aggOne.keySet() ){
+//            newAggregate.put(key, aggOne.get(key));
+//          }
+//        }
+//        return newAggregate;
+        return aggOne;
       }
 
       @Override
