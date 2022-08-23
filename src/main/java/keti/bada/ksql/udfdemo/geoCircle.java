@@ -8,7 +8,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 
-@UdfDescription(name = "geoCircle", description = "The two inputs are (lat, lng) pairs and radius. Enter the radius in meters. Return GeoJson Polygon. Polygon has a default of 32 points, which can be changed to optional parameters.")
+@UdfDescription(name = "geo_circle", description = "The two inputs are (lat, lng) pairs and radius. Enter the radius in meters. Return GeoJson Polygon. Polygon has a default of 32 points, which can be changed to optional parameters.")
 public class geoCircle {
 
 
