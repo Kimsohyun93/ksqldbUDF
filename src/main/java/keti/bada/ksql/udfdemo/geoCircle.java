@@ -27,7 +27,7 @@ public class geoCircle {
     return shapeFactory.createCircle();
   }
 
-  @Udf(description = "Create GeoJson Polygon with two inputs (lat,lng) pairs and radius. All Input types are Double.")
+  @Udf(description = "Create GeoJson Polygon with two inputs (lat,lng) pairs and radius as Double, num_points as int")
   public Polygon geo_circle(@UdfParameter(value = "lat", description = "the latitude of the center of the circle") double lat,
                            @UdfParameter(value = "lng", description = "the longitude of the center of the circle") double lng,
                            @UdfParameter(value = "radius", description = "the radius of the circle") double radius,
