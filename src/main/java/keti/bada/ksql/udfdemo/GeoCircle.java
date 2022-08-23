@@ -3,13 +3,12 @@ package keti.bada.ksql.udfdemo;
 import io.confluent.ksql.function.udf.Udf;
 import io.confluent.ksql.function.udf.UdfDescription;
 import io.confluent.ksql.function.udf.UdfParameter;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 
 @UdfDescription(name = "geo_circle", description = "The two inputs are (lat, lng) pairs and radius. Enter the radius in meters. Return GeoJson Polygon. Polygon has a default of 32 points, which can be changed to optional parameters.")
-public class geoCircle {
+public class GeoCircle {
 
   @Udf(description = "Create GeoJson Polygon with two inputs (lat,lng) pairs and radius. All Input types are Double.")
   public Polygon geo_circle(@UdfParameter(value = "lat", description = "the latitude of the center of the circle") double lat,
