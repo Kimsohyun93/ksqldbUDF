@@ -11,11 +11,10 @@ import com.vividsolutions.jts.util.GeometricShapeFactory;
 @UdfDescription(name = "geo_circle", description = "The two inputs are (lat, lng) pairs and radius. Enter the radius in meters. Return GeoJson Polygon. Polygon has a default of 32 points, which can be changed to optional parameters.")
 public class geoCircle {
 
-
   @Udf(description = "Create GeoJson Polygon with two inputs (lat,lng) pairs and radius. All Input types are Double.")
   public Polygon geocircle(@UdfParameter(value = "lat", description = "the latitude of the center of the circle") double lat,
                            @UdfParameter(value = "lng", description = "the longitude of the center of the circle") double lng,
-                           @UdfParameter(value = "radius", description = "radius of the circle") int radius) {
+                           @UdfParameter(value = "radius", description = "radius of the circle") double radius) {
     GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
     shapeFactory.setNumPoints(32);
     shapeFactory.setCentre(new Coordinate(lat, lng));
@@ -31,7 +30,7 @@ public class geoCircle {
   @Udf(description = "Create GeoJson Polygon with two inputs (lat,lng) pairs and radius. All Input types are Double.")
   public Polygon geocircle(@UdfParameter(value = "lat", description = "the latitude of the center of the circle") double lat,
                            @UdfParameter(value = "lng", description = "the longitude of the center of the circle") double lng,
-                           @UdfParameter(value = "radius", description = "the radius of the circle") int radius,
+                           @UdfParameter(value = "radius", description = "the radius of the circle") double radius,
                            @UdfParameter(value = "num_points", description = "the number of points ") int num_points) {
     GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
     shapeFactory.setNumPoints(num_points);
