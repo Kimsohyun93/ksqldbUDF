@@ -44,12 +44,14 @@ public class GeoCircle {
 //    return shapeFactory.createCircle();
 //  }
   @Udf(description = "multiply two non-nullable INTs.")
-  public long geo_circle(@UdfParameter(value = "v1", description = "first value to multiply") int v1,
+  public Polygon geo_circle(@UdfParameter(value = "v1", description = "first value to multiply") int v1,
                          @UdfParameter(value = "v2", description = "second value to multiply") int v2,
                          @UdfParameter(value = "lat", description = "the latitude of the center of the circle") double lat,
                          @UdfParameter(value = "lng", description = "the longitude of the center of the circle") double lng,
                          @UdfParameter(value = "radius", description = "radius of the circle") double radius) {
-    return v1 * v2;
+    GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
+    return shapeFactory.createCircle();
+//    return v1 * v2;
   }
 
   @Udf(description = "multiply two nullable BIGINTs. If either param is null, null is returned.")
